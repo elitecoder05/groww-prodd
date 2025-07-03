@@ -1,21 +1,26 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 
 export default function WishlistScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Wishlist</Text>
-      <Text style={styles.subtitle}>Your favorite stocks and watchlist will appear here</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Wishlist</Text>
+        <Text style={styles.subtitle}>Your favorite stocks and watchlist will appear here</Text>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
     padding: 20,
   },
   title: {

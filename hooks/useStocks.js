@@ -20,18 +20,27 @@ export const useStocks = () => {
       setLoading(true);
       setError(null);
       
+      console.log('Fetching stocks data...');
       const data = await stockService.fetchTopGainersLosers();
+      console.log('Stocks data received:', data);
       
       setStocks({
-        topGainers: data.topGainers,
-        topLosers: data.topLosers,
-        mostActive: data.mostActive,
+        topGainers: data.topGainers || [],
+        topLosers: data.topLosers || [],
+        mostActive: data.mostActive || [],
       });
       
-      setLastUpdated(data.lastUpdated);
+      setLastUpdated(data.lastUpdated || new Date().toISOString());
     } catch (err) {
-      setError(err.message);
       console.error('Error in useStocks hook:', err);
+      setError(err.message || 'Failed to fetch stock data');
+      
+      // Set empty arrays as fallback
+      setStocks({
+        topGainers: [],
+        topLosers: [],
+        mostActive: [],
+      });
     } finally {
       setLoading(false);
     }

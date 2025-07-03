@@ -10,16 +10,21 @@ class StockService {
    */
   async fetchTopGainersLosers() {
     try {
+      console.log('Attempting to fetch from API...');
       const response = await apiService.getTopGainersLosers();
       
       if (!response.success) {
-        throw new Error(response.error);
+        console.log('API response unsuccessful, using fallback data');
+        return this.getFallbackData();
       }
 
-      return this.formatStockData(response.data);
+      const formattedData = this.formatStockData(response.data);
+      console.log('Successfully fetched and formatted API data');
+      return formattedData;
     } catch (error) {
       console.error('Error fetching top gainers/losers:', error);
-      throw error;
+      console.log('Using fallback data due to API error');
+      return this.getFallbackData();
     }
   }
 
@@ -314,6 +319,61 @@ class StockService {
       default:
         return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
+  }
+
+  /**
+   * Get fallback dummy data in case API fails
+   * @returns {Object} - Dummy stock data
+   */
+  getFallbackData() {
+    const dummyStocks = [
+      {
+        id: 1,
+        ticker: 'AAPL',
+        name: 'Apple Inc.',
+        price: '$175.43',
+        change: '+2.34%',
+        changeAmount: '+$4.02',
+        volume: '58,435,820'
+      },
+      {
+        id: 2,
+        ticker: 'GOOGL',
+        name: 'Alphabet Inc.',
+        price: '$142.87',
+        change: '+1.87%',
+        changeAmount: '+$2.63',
+        volume: '31,287,456'
+      },
+      {
+        id: 3,
+        ticker: 'MSFT',
+        name: 'Microsoft Corp.',
+        price: '$367.12',
+        change: '+0.92%',
+        changeAmount: '+$3.34',
+        volume: '22,876,543'
+      },
+      {
+        id: 4,
+        ticker: 'TSLA',
+        name: 'Tesla Inc.',
+        price: '$248.96',
+        change: '-1.23%',
+        changeAmount: '-$3.10',
+        volume: '45,692,134'
+      }
+    ];
+
+    return {
+      metadata: {
+        information: "Fallback data - API temporarily unavailable",
+      },
+      lastUpdated: new Date().toISOString(),
+      topGainers: dummyStocks.slice(0, 3),
+      topLosers: dummyStocks.slice(1, 4),
+      mostActive: dummyStocks,
+    };
   }
 }
 

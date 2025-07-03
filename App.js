@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import * as SplashScreen from 'expo-splash-screen';
+import 'react-native-gesture-handler';
 
 import StocksStackNavigator from './navigation/StocksStackNavigator';
 import WishlistScreen from './screens/WishlistScreen';
@@ -10,7 +12,19 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 const Tab = createBottomTabNavigator();
 
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
 export default function App() {
+  useEffect(() => {
+    // Hide splash screen after a short delay to ensure app is ready
+    const timer = setTimeout(() => {
+      SplashScreen.hideAsync();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <ErrorBoundary>
       <NavigationContainer>
