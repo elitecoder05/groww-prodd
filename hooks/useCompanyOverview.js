@@ -11,14 +11,14 @@ export const useCompanyOverview = (symbol) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchCompanyOverview = async () => {
+  const fetchCompanyOverview = async (forceRefresh = false) => {
     if (!symbol) return;
     
     try {
       setLoading(true);
       setError(null);
       
-      const data = await stockService.fetchCompanyOverview(symbol);
+      const data = await stockService.fetchCompanyOverview(symbol, forceRefresh);
       setCompanyData(data);
     } catch (err) {
       setError(err.message);
@@ -28,8 +28,8 @@ export const useCompanyOverview = (symbol) => {
     }
   };
 
-  const refreshData = () => {
-    fetchCompanyOverview();
+  const refreshData = (forceRefresh = true) => {
+    fetchCompanyOverview(forceRefresh);
   };
 
   useEffect(() => {

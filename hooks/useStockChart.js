@@ -12,14 +12,14 @@ export const useStockChart = (symbol) => {
   const [error, setError] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState('1M');
 
-  const fetchChartData = async (period = selectedPeriod) => {
+  const fetchChartData = async (period = selectedPeriod, forceRefresh = false) => {
     if (!symbol) return;
     
     setLoading(true);
     setError(null);
     
     try {
-      const data = await stockService.fetchChartData(symbol, period);
+      const data = await stockService.fetchStockChart(symbol, period, forceRefresh);
       setChartData(data);
     } catch (err) {
       setError(err.message);
@@ -34,8 +34,8 @@ export const useStockChart = (symbol) => {
     fetchChartData(period);
   };
 
-  const refreshData = () => {
-    fetchChartData(selectedPeriod);
+  const refreshData = (forceRefresh = true) => {
+    fetchChartData(selectedPeriod, forceRefresh);
   };
 
   useEffect(() => {

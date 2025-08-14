@@ -15,13 +15,13 @@ export const useStocks = () => {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  const fetchStocks = async () => {
+  const fetchStocks = async (forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
       
       console.log('Fetching stocks data...');
-      const data = await stockService.fetchTopGainersLosers();
+      const data = await stockService.fetchTopGainersLosers(forceRefresh);
       console.log('Stocks data received:', data);
       
       setStocks({
@@ -46,8 +46,8 @@ export const useStocks = () => {
     }
   };
 
-  const refreshStocks = () => {
-    fetchStocks();
+  const refreshStocks = (forceRefresh = false) => {
+    fetchStocks(forceRefresh);
   };
 
   useEffect(() => {

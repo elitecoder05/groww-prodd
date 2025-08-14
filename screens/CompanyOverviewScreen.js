@@ -12,7 +12,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useCompanyOverview } from '../hooks/useCompanyOverview';
 import { useStockChart } from '../hooks/useStockChart';
+import { useWishlist } from '../hooks/useWishlist';
 import SimpleLineChart from '../components/SimpleLineChart';
+import StockChart from '../components/StockChart';
+import WishlistModal from '../components/WishlistModal';
 
 const { width } = Dimensions.get('window');
 
@@ -55,9 +58,27 @@ export default function CompanyOverviewScreen({ route, navigation }) {
   const { symbol, currentPrice, change } = route.params;
   const { companyData, loading, error, refreshData } = useCompanyOverview(symbol);
   const { chartData, loading: chartLoading, error: chartError, selectedPeriod, changePeriod, refreshData: refreshChart } = useStockChart(symbol);
+  const { getWishlistsContainingStock } = useWishlist();
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [showWishlistModal, setShowWishlistModal] = useState(false);
 
   const periods = ['1W', '1M', '3M', '6M', '1Y', '5Y'];
+
+  // Check if stock is already in wishlist
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      try {
+        const wishlistIds = await getWishlistsContainingStock(symbol);
+        setIsWishlisted(wishlistIds.length > 0);
+      } catch (error) {
+        console.error('Error checking wishlist status:', error);
+      }
+    };
+
+    if (symbol) {
+      checkWishlistStatus();
+    }
+  }, [symbol, getWishlistsContainingStock]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -72,7 +93,7 @@ export default function CompanyOverviewScreen({ route, navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.wishlistButton}
-            onPress={() => setIsWishlisted(!isWishlisted)}
+            onPress={() => setShowWishlistModal(true)}
           >
             <Ionicons
               name={isWishlisted ? 'bookmark' : 'bookmark-outline'}
@@ -89,6 +110,24 @@ export default function CompanyOverviewScreen({ route, navigation }) {
     refreshData();
     refreshChart();
   };
+
+  const handleWishlistSuccess = async () => {
+    // Refresh wishlist status after successful addition
+    try {
+      const wishlistIds = await getWishlistsContainingStock(symbol);
+      setIsWishlisted(wishlistIds.length > 0);
+    } catch (error) {
+      console.error('Error refreshing wishlist status:', error);
+    }
+  };
+
+  const createStockObject = () => ({
+    symbol: symbol,
+    ticker: symbol,
+    name: companyData?.name || 'Unknown Company',
+    price: currentPrice,
+    change: change,
+  });
 
   const renderChart = () => {
     if (chartLoading) {
@@ -123,10 +162,13 @@ export default function CompanyOverviewScreen({ route, navigation }) {
     }
 
     return (
-      <SimpleLineChart 
+      <StockChart
         data={chartData.rawData} 
         width={width - 40} 
-        height={220} 
+        height={240}
+        period={selectedPeriod}
+        color="#00D09C"
+        showDetails={false}
       />
     );
   };
@@ -165,6 +207,7 @@ export default function CompanyOverviewScreen({ route, navigation }) {
   const changeColor = isPositive ? '#00C851' : '#FF4444';
 
   return (
+    <>
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Company Header */}
       <View style={styles.header}>
@@ -275,6 +318,15 @@ export default function CompanyOverviewScreen({ route, navigation }) {
         </View>
       </View>
     </ScrollView>
+
+    {/* Wishlist Modal */}
+    <WishlistModal
+      isVisible={showWishlistModal}
+      onClose={() => setShowWishlistModal(false)}
+      stock={createStockObject()}
+      onSuccess={handleWishlistSuccess}
+    />
+    </>
   );
 }
 
