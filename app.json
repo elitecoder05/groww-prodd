@@ -21,14 +21,17 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.siddu13.growwprod",
-      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"]
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "55190a0d-6ffb-427e-aefd-93e5dd094fe6"
+        "projectId": "4c776c80-3a6d-4e36-b09b-032716913d33"
       }
     }
   }
